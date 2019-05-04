@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script>
+        function buttonPress() {
+            that = this;
+            $.ajax({
+               type: "GET",
+               url: "/keygen",
+               success: function(key){
+                 var geturl = "https://api.pwnedpasswords.com/range/" + key["hashkey"].slice(0, 5);
+                $.ajax({
+                   type: "GET",
+                   url: geturl,
+                   success: function(data){
+                      var jsondata = handleData(data);
+                      checkformatch(jsondata, key);
+                   }
+                });
+               }
+            });
+        }
+
+        function handleData(data) {
+            console.log("handleData: " + data);
+            var splitdata = data.split("\n");
+            var jsondata = [];
+            for (i = 0; i < splitdata.length; i++) {
+                var hash = splitdata[i].slice(0,35);
+                var count = splitdata[i].slice(36);
+                jsondata.push({hash : hash, count : count});
+            }
+            // TODO does not crate valid JSON somehow
+            var jsonwithr = JSON.stringify(jsondata);
+            return jsonwithr.replace(/\\r/gi, "")
+
+        }
+
+        function checkformatch(jsondata, key) {
+            console.log("KEY: " + key["hashkey"]);
+            console.log("JSONDATA: \n" + jsondata);
+            for (i = 0; i < jsondata.length; i++) {
+                var obj = jsondata[i];
+               console.log("HASH " + i + " : " + obj.hash);
+            }
+            // TODO access hashes and check if they match the key
+        }
+    </script>
+</head>
+<body>
+    <button onclick="buttonPress()">Press</button>
+    <label id="label1">Placeholder</label>
+
+</body>
+</html>
