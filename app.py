@@ -12,6 +12,11 @@ def hello_world():
     return read_file(STATIC_FILE_DIRECTORY + "frontend/index.html")
 
 
+@app.route('/js/main.js')
+def serve_mainjs():
+    return read_file(STATIC_FILE_DIRECTORY + "js/main.js")
+
+
 @app.route('/keygen')
 def getKeyGen():
     clearkey = keygen.keygen()
