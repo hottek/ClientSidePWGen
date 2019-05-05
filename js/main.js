@@ -1,30 +1,38 @@
 function buttonPress() {
-        $.ajax({
-            type: "GET",
-            url: "/keygen",
-            success: function (key) {
-                var firstfive = key["hashkey"].slice(0, 5);
-                var geturl = "https://api.pwnedpasswords.com/range/" + firstfive;
-                $.ajax({
-                    type: "GET",
-                    url: geturl,
-                    success: function (data) {
-                        var jsondata = handleData(data);
-                        var isvalid = checkformatch(jsondata, key);
-                        /*
-                           TODO this doesn't work;
-                            these ajax functions have to be called individually.
-                            currently this creates a huge loop, by huge the data saved in RAM is meant.
-                        * */
-                        while (!isvalid) {
-                            console.log("no valid key found, trying again");
-                            buttonPress();
-                        }
-                            console.log("pw found: " + key["clearkey"]);
-                    }
-                });
-            }
-        });
+    var key;
+    var isvalid = false;
+    while (!isvalid) {
+        key = getKeyGen();
+        var firstfive = key["hashkey"].slice(0, 5);
+        var geturl = "https://api.pwnedpasswords.com/range/" + firstfive;
+        var data = getData(geturl);
+        isvalid = checkformatch(data, key);
+        console.log("pw found: " + key["clearkey"]);
+     }
+}
+
+function getKeyGen() {
+    var keydata = null;
+    $.ajax({
+        type: "GET",
+        url: "/keygen",
+        success: function (key) {
+            keydata = key; // TODO is null
+        }
+     });
+    return keydata;
+}
+
+function getData(geturl) {
+    var jsondata = null;
+    $.ajax({
+        type: "GET",
+        url: geturl,
+        success: function (data) {
+            jsondata = data;
+        }
+     });
+     return jsondata;
 }
 
 function handleData(data) {
@@ -36,7 +44,6 @@ function handleData(data) {
         jsondata.push({hash : hash, count : count});
     }
     return jsondata;
-
 }
 
 function checkformatch(jsondata, key) {
