@@ -6,18 +6,20 @@ function buttonPress() {
         var firstfive = key["hashkey"].slice(0, 5);
         var geturl = "https://api.pwnedpasswords.com/range/" + firstfive;
         var data = getData(geturl);
-        isvalid = checkformatch(data, key);
-        console.log("pw found: " + key["clearkey"]);
+        var jsondata = handleData(data)
+        isvalid = checkformatch(jsondata, key);
      }
+     console.log("pw found: " + key["clearkey"]);
 }
 
 function getKeyGen() {
     var keydata = null;
     $.ajax({
         type: "GET",
+        async: false,
         url: "/keygen",
         success: function (key) {
-            keydata = key; // TODO is null
+            keydata = key;
         }
      });
     return keydata;
@@ -27,6 +29,7 @@ function getData(geturl) {
     var jsondata = null;
     $.ajax({
         type: "GET",
+        async: false,
         url: geturl,
         success: function (data) {
             jsondata = data;
@@ -54,8 +57,10 @@ function checkformatch(jsondata, key) {
         var obj = jsondata[i];
         if (obj.hash === checkkey.toUpperCase()) {
             index = i;
+            retvalue = false;
+            console.log("MATCH FOUND AT " + i + "\n occured " + obj.count + " times");
+        } else {
             retvalue = true;
-            console.log("MATCH FOUND AT " + i + "\n occured " + obj.count + "times");
         }
     }
     return retvalue;
