@@ -10,7 +10,7 @@ def keygen():
         rannumber = random.randint(0,len(chars)-1)
         key += chars[rannumber]
 
-    return key
+    return "password"
 
 
 def hashkey(key):
